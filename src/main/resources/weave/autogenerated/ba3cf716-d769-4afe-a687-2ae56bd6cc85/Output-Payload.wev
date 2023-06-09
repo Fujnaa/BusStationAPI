@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_ba3cf716_d769_4afe_a687_2ae56bd6cc85_Output_Payload = Array<{|  ZaposleniID: Number,   JMBG: String,   Ime: String,   Prezime: String,   Adresa?: String,   Grad?: String,   BrojSaltera?: String,   Kontakt: String|}>
+

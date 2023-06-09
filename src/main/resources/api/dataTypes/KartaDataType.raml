@@ -1,0 +1,41 @@
+#%RAML 1.0 DataType
+
+type: object
+properties:
+  kartaID?: integer
+  brojPerona: string
+  brojSedista: string
+  datumPolaska: string
+  datumDolaska: string
+  korisnik:
+    type: object
+    required: false
+    properties:
+      korisnikID?: integer
+      JMBG: string
+      ime: string
+      prezime: string
+      adresa?: string
+      grad?: string
+  tipKarte:
+    type: object
+    required: false
+    properties:
+      tipKarteID?: integer
+      nazivKarte: string
+  ruta:
+    type: object
+    required: false
+    properties:
+      rutaID?: integer
+      mestoDolaska: string
+      mestoOdlaska: string
+      brojPosecenihStanica: integer
+  autobus:
+    type: object
+    required: false
+    properties: 
+      autobusID?: integer
+      prevoznik?: string
+      tipAutobusa?: string
+      brojSedista?: number

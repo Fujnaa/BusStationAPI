@@ -1,0 +1,2029 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<flow name="getAllAutobus" doc:id="4bd7dcf0-99f1-47b2-8c4c-b16a6f58ed57" >
+		<db:select doc:name="Select" doc:id="075b0150-cc44-4362-a7c9-5eabb29407ae" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select *
+From tblAutobus]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="aff2e66a-b345-4924-b983-2117a20bb177" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	autobusID: (payload01.AutobusID default 0),
+	prevoznik: payload01.Prevoznik,
+	tipAutobusa: payload01.TipAutobusa,
+	brojSedista: payload01.BrojSedista
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllVozac" doc:id="3616985b-f2e7-406a-82ae-d5291351cc6d" >
+		<db:select doc:name="Select" doc:id="3070b9b5-8cf9-4762-98d6-3fc47e0faf81" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select *
+From tblVozac]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="30d82319-f5e7-4245-8817-f5d373911f9e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	vozacID: payload01.VozacID,
+	jmbg: payload01.JMBG,
+	ime: payload01.Ime,
+	prezime:payload01.Prezime,
+	adresa: payload01.Adresa,
+	grad: payload01.Grad,
+	kontakt:payload01.Kontakt,
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllGaraza" doc:id="f683f3f4-d5f9-4a73-b666-dc856e8b1339" >
+		<db:select doc:name="Select" doc:id="963d4f89-f7a2-4bd2-b164-b362d137a5c5" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblGaraza]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0c52d066-3cff-4764-b4cd-a8eb157cb120" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	garazaID: payload01.GarazaID,
+	lokacija: payload01.Lokacija,
+	brojGaraze: payload01.BrojGaraze
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllKarta" doc:id="c48d5e81-ef56-4d4c-b8b1-5d3fc80c5112" >
+		<db:select doc:name="Select" doc:id="5f119e05-5544-4da9-afc8-c894c00a8681" config-ref="Database_Config">
+			<db:sql ><![CDATA[select kar.kartaID, brojperona, kar.brojsedista as 'AutobusBrojSedista', datumpolaska, datumdolaska, kor.korisnikID,
+jmbg, ime, prezime, grad, tk.tipkarteID, nazivKarte, r.rutaID, mestodolaska, mestoodlaska,
+brojPosecenihStanica, a.AutobusID, prevoznik, tipAutobusa, a.brojSedista
+from tblKarta kar join tblKorisnik kor on (kar.korisnikID = kor.korisnikID)
+join tblTipKarte tk on (kar.tipKarteID = tk.tipKarteID)
+join tblRuta r on (kar.rutaID = r.rutaID)
+join tblAutobus a on (kar.autobusID = a.autobusID)]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="934ecca4-402a-40b3-a424-c3ce5543f55c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	KartaID: payload01.KartaID,
+	BrojPerona: payload01.BrojPerona,
+	BrojSedista: payload01.AutobusBrojSedista,
+	DatumPolaska: payload01.DatumPolaska,
+	DatumDolaska: payload01.DatumDolaska,
+	KorisnikID: payload01.KorisnikID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad : payload01.Grad,
+	TipKarteID: payload01.TipKarteID,
+	NazivKarte: payload01.NazivKarte,
+	RutaID: payload01.RutaID,
+	MestoDolaska: payload01.MestoDolaska,
+	MestoOdlaska: payload01.MestoOdlaska,
+	BrojPosecenihStanica: payload01.BrojPosecenihStanica,
+	AutobusID: payload01.AutobusID,
+	Prevoznik: payload01.Prevoznik,
+	TipAutobusa: payload01.TipAutobusa,
+	BrojSedista: payload01.BrojSedista
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllKorisnik" doc:id="d127368b-6c16-4cf0-8bdd-f808e374097b" >
+		<db:select doc:name="Select" doc:id="d17bd3b9-e987-4208-a4c2-9949877bea32" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblKorisnik]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="13f2dad1-d759-4ed7-9e51-6be8e37a1642" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	KorisnikID: payload01.KorisnikID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad: payload01.Grad
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllRuta" doc:id="6b169e9b-5a6b-4887-bec4-ddfca9d242a3" >
+		<set-variable value="#[message.attributes.headers.mestoOdlaska]" doc:name="mestoOdlaska" doc:id="3de4ba93-d96d-401e-b925-bf2998da2fe8" variableName="mestoOdlaska"/>
+		<choice doc:name="Choice" doc:id="47ae0477-441b-484d-a4b2-a6553198c82f" >
+			<when expression='#[vars.mestoOdlaska != null]'>
+				<db:select doc:name="Select" doc:id="2f0aefc4-b782-44ea-abab-c4e526421add" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblRuta
+where mestoOdlaska = :mestoOdlaska]]></db:sql>
+			<db:input-parameters><![CDATA[#[{'mestoOdlaska' : vars.mestoOdlaska}]]]></db:input-parameters>
+		</db:select>
+			</when>
+			<otherwise >
+				<db:select doc:name="Select" doc:id="67967931-d440-4a03-9dcc-bba35a66947a" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblRuta]]></db:sql>
+				</db:select>
+			</otherwise>
+		</choice>
+		<validation:is-not-null doc:name="Is not null" doc:id="f6729757-5429-4c6b-b7b4-7afba5fb5ab6" value="#[payload.RutaID]" />
+		<ee:transform doc:name="Transform Message" doc:id="fc6c8630-3a2e-4cee-aebc-8109ed2cc368" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	RutaID: payload01.RutaID,
+	MestoDolaska: payload01.MestoDolaska,
+	MestoOdlaska: payload01.MestoOdlaska,
+	BrojPosecenihStanica: payload01.BrojPosecenihStanica
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7a0ff8f3-9d61-436c-b1cf-037365d4a3e1" >
+				<choice doc:name="Choice" doc:id="036935fd-ebf5-4976-8ebc-04da8823e3ce" >
+					<when expression='#[vars.mestoOdlaska != ""]' >
+						<ee:transform doc:name="Transform Message" doc:id="7f8b2f90-f54c-4f63-b008-1708710a0ffe" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji mesto odlaska sa navedenom vrednoscu.'
+	
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<otherwise>
+						<ee:transform doc:name="Transform Message" doc:id="53a5c8c9-0ec8-49b6-b177-8032d73ba166" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Pogresan format header-a!'
+	
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</otherwise>
+				</choice>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getAllTipKarte" doc:id="3103523e-8687-435e-9284-ef5fd76868a7" >
+		<db:select doc:name="Select" doc:id="ee3f3130-654c-4bee-ae57-8fe29d7b3cb3" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblTipKarte]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="7f798be3-8b6e-4750-bfad-ce241a01ffdf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	TipKarteID: payload01.TipKarteID,
+	NazivKarte: payload01.NazivKarte
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAllZaposleni" doc:id="271b21da-30d6-4e2f-8a6f-cbc159f88971" >
+		<db:select doc:name="Select" doc:id="044d76b2-b57b-4056-a9d8-f97ca9f52dea" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblZaposleni]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="4b924d6d-893a-4ac4-b979-9b3100b57f70" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	zaposleniID: payload01.ZaposleniID,
+	jmbg: payload01.JMBG,
+	ime: payload01.Ime,
+	prezime: payload01.Prezime,
+	adresa: payload01.Adresa,
+	grad: payload01.Grad,
+	brojSaltera: payload01.BrojSaltera,
+	kontakt: payload01.Kontakt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getAutobusByID" doc:id="8265557e-32ac-48d7-89fd-827118ecbf37" >
+		<db:select doc:name="Select" doc:id="d37f92b8-a70c-4678-aab9-aa89e29d7709" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblAutobus
+where AutobusID = :AutobusID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'AutobusID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="0b9906ce-f5f3-47a3-8eda-8ff9e3422dc4" value="#[payload.AutobusID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="17fb7527-7091-40e8-8b65-cc15e600933b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	AutobusID: payload01.AutobusID default 0,
+	Prevoznik: payload01.Prevoznik,
+	TipAutobusa: payload01.TipAutobusa,
+	BrojSedista: payload01.BrojSedista
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="fc8fbd78-ca1b-403c-8f80-14f31bd8dfe3" >
+				<ee:transform doc:name="Transform Message" doc:id="edb9fed3-4ec4-4025-a1d5-2047d462cd91" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji autobus sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="httpStatus" doc:id="66a34277-b41d-4821-9aea-74358ad7a77c" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getVozacByID" doc:id="86fcb88a-b0a4-4917-abc3-7d02aa9168c0" >
+		<db:select doc:name="Select" doc:id="b4730783-8892-4915-ba45-6a4643bc58fc" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblVozac
+where VozacID = :VozacID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'VozacID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="e4a77815-7a19-4d26-9217-235d6ec57efa" value="#[payload.VozacID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="36dca2c3-4711-4e2f-9b8c-7066b9382d79" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	VozacID: payload01.VozacID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad: payload01.Grad,
+	Kontakt: payload01.Kontakt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="da2fbf96-0334-40dd-b24c-037f37894027" >
+				<ee:transform doc:name="Transform Message" doc:id="4798cd38-dfbb-4d22-8b86-711297ea0019" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Ne postoji vozac sa datim ID-jem'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="907b348a-1c3e-4031-96c4-a2244f8e27bb" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getGarazaByID" doc:id="a5ea98ae-610b-4069-a437-17e18a306807" >
+		<db:select doc:name="Select" doc:id="31dd3a75-67c2-4a1d-a3ee-7bda37fe559c" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblGaraza
+where GarazaID = :GarazaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'GarazaID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="fc990cd1-bf37-4844-bb56-530053ce93e3" value="#[payload.GarazaID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="cabcc6fc-2bf7-4fb5-aedb-912c500854f2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	GarazaID: payload01.GarazaID,
+	Lokacija: payload01.Lokacija,
+	BrojGaraze: payload01.BrojGaraze
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d553379d-07db-4846-af84-21794be80a0f" >
+				<ee:transform doc:name="Transform Message" doc:id="1e2509d0-1688-4978-beff-df1728a3fb16" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Ne postoji garaza sa datim ID-jem'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="dc0bd5d3-1053-4124-870b-e497dd3149ed" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getKartaByID" doc:id="53b30ffb-e287-4de7-8473-b0b53664c4b7" >
+		<db:select doc:name="Select" doc:id="00216d85-c573-4016-8ab3-30f861d69db3" config-ref="Database_Config">
+			<db:sql ><![CDATA[select kar.kartaID, brojperona, kar.brojsedista as 'AutobusBrojSedista', datumpolaska, datumdolaska, kor.korisnikID,
+jmbg, ime, prezime, grad, tk.tipkarteID, nazivKarte, r.rutaID, mestodolaska, mestoodlaska,
+brojPosecenihStanica, a.AutobusID, prevoznik, tipAutobusa, a.brojSedista
+from tblKarta kar join tblKorisnik kor on (kar.korisnikID = kor.korisnikID)
+join tblTipKarte tk on (kar.tipKarteID = tk.tipKarteID)
+join tblRuta r on (kar.rutaID = r.rutaID)
+join tblAutobus a on (kar.autobusID = a.autobusID)
+where KartaID = :KartaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'KartaID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="8b0216e6-7349-4c0f-ae8e-5f4056ce8636" value="#[payload.KartaID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="6df35c9c-4d1c-4a53-a365-a10a957d0cdd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	KartaID: payload01.KartaID,
+	BrojPerona: payload01.BrojPerona,
+	BrojSedista: payload01.AutobusBrojSedista,
+	DatumPolaska: payload01.DatumPolaska,
+	DatumDolaska: payload01.DatumDolaska,
+	KorisnikID: payload01.KorisnikID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad : payload01.Grad,
+	TipKarteID: payload01.TipKarteID,
+	NazivKarte: payload01.NazivKarte,
+	RutaID: payload01.RutaID,
+	MestoDolaska: payload01.MestoDolaska,
+	MestoOdlaska: payload01.MestoOdlaska,
+	BrojPosecenihStanica: payload01.BrojPosecenihStanica,
+	AutobusID: payload01.AutobusID,
+	Prevoznik: payload01.Prevoznik,
+	TipAutobusa: payload01.TipAutobusa,
+	BrojSedista: payload01.BrojSedista
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4cf88091-4341-482d-ba7c-41b27d19af4a" >
+				<ee:transform doc:name="Transform Message" doc:id="6c5349a2-9db9-4fdb-9388-4c54bc16ee15" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji karta sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="dda35539-78bc-425e-b239-992d47ad4531" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getKorisnikByID" doc:id="f6b275ff-8b28-4507-bd39-e867bf00287a" >
+		<db:select doc:name="Select" doc:id="6542005f-656e-45d6-b575-6aaa9e3b17ff" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblKorisnik
+where KorisnikID = :KorisnikID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'KorisnikID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="0375b747-9b83-4cc3-b293-81ffdc0a6af6" value="#[payload.KorisnikID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="32670ba0-fcbd-4913-a57e-a35eec2c275c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	KorisnikID: payload01.KorisnikID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad: payload01.Grad
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="eff1b3d7-2dbf-4d43-909c-7147cb65e916" >
+				<ee:transform doc:name="Transform Message" doc:id="ae33bc2b-25f5-40b1-a882-9c4d03ea0138" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message : 'Ne postoji korisnik sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="a040d50c-82e3-4e01-8b46-1573dd655c58" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getRutaByID" doc:id="bd95b597-9a92-445d-8199-79a83ab7c94b" >
+		<db:select doc:name="Select" doc:id="36b9874e-eed3-4258-b309-2820a710cdf6" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblRuta
+where RutaID = :RutaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'RutaID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="0d574d92-9369-490b-a336-c935d848b852" value="#[payload.RutaID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="f02c28b6-1b7c-4875-ab58-59566d737399" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	RutaID: payload01.RutaID,
+	MestoDolaska: payload01.MestoDolaska,
+	MestoOdlaska: payload01.MestoOdlaska,
+	BrojPosecenihStanica: payload01.BrojPosecenihStanica
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="609e823b-5336-480d-9033-50dc4f6475e3" >
+				<ee:transform doc:name="Transform Message" doc:id="52517729-c41e-417a-88aa-be2da11c276d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji ruta sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="1ba29bb3-468c-4aec-ace8-eee38f18d79e" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getTipKarteByID" doc:id="7872f275-62fc-4a6e-81f7-c524ee6b1366" >
+		<db:select doc:name="Select" doc:id="2ce8faeb-713f-4266-b446-b250c471653a" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblTipKarte
+where TipKarteID = :TipKarteID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'TipKarteID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="5080f7a7-ec67-41e9-86c1-5e2268564b06" value="#[payload.TipKarteID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="7a982827-9237-43f5-87bd-f8535340424e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	TipKarteID: payload01.TipKarteID,
+	NazivKarte: payload01.NazivKarte
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="92ba004d-03a4-4a6d-9c84-1b59ecd33bfb" >
+				<ee:transform doc:name="Transform Message" doc:id="8b1a1fcc-d513-4ce1-94ce-7712ac8f37c2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message : 'Ne postoji ruta sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="ce3bc304-c0c9-493c-9aa1-806765b97b6c" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="getZaposleniByID" doc:id="ba3cf716-d769-4afe-a687-2ae56bd6cc85" >
+		<db:select doc:name="Select" doc:id="2db4f2df-4373-44d7-9cdc-53d109e1e91f" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblZaposleni
+where ZaposleniID = :ZaposleniID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ZaposleniID' : attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="f9597f47-942b-4bd9-a7b9-f3e29cc0e18c" value="#[payload.ZaposleniID]"/>
+		<ee:transform doc:name="Transform Message" doc:id="dd64f0f0-144c-4463-a359-7cce1985195c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	ZaposleniID: payload01.ZaposleniID,
+	JMBG: payload01.JMBG,
+	Ime: payload01.Ime,
+	Prezime: payload01.Prezime,
+	Adresa: payload01.Adresa,
+	Grad: payload01.Grad,
+	BrojSaltera: payload01.BrojSaltera,
+	Kontakt: (payload01.Kontaktdefault "") ++ payload01.Kontakt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="cee1f41d-b5dc-440a-a61d-76700e7e4eab" >
+				<ee:transform doc:name="Transform Message" doc:id="fa3394ce-12a6-49ab-a3fb-92a905019cd9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji zaposleni sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="984f0d72-9eaa-433b-a6ee-ac4082578919" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertAutobus" doc:id="090311b8-c656-4d66-bafd-d4f0320ae434" >
+		<set-variable value='#[message.payload]' doc:name="autobus" doc:id="f318f70d-0269-46e0-aee3-867562975758" variableName="autobus" />
+		<db:select doc:name="Select" doc:id="323dc28b-9b75-414d-927a-a4131081c3a7" config-ref="Database_Config">
+			<db:sql ><![CDATA[select *
+from tblAutobus
+where Prevoznik = :Prevoznik and
+TipAutobusa = :TipAutobusa and
+brojSedista = :BrojSedista]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"Prevoznik" : vars.autobus.prevoznik,
+	"TipAutobusa" : vars.autobus.tipAutobusa, 
+	"BrojSedista" : vars.autobus.brojSedista
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="63c0d58f-d4e1-4b3f-9b42-53e88a612bf7" value="#[payload.Prevoznik]"/>
+		<db:insert doc:name="Insert" doc:id="053be544-2f41-417a-bfef-c1048c9340d3" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into tblAutobus (Prevoznik, TipAutobusa, BrojSedista)
+	values (:Prevoznik, :TipAutobusa, :BrojSedista);  ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"Prevoznik" : vars.autobus.prevoznik,
+	"TipAutobusa" : vars.autobus.tipAutobusa, 
+	"BrojSedista" : vars.autobus.brojSedista
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="5dcc0031-be3b-40b1-92b4-8f5e3ddadced" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodat je novi autobus.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f1a62853-2360-4855-9bb7-61f6cb53dec6" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="3bf9d5c1-5f68-4132-8427-d2f5f72d0df1" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji autobus sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="1d83b061-118e-4849-a91d-6411d46f80c4" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertGaraza" doc:id="273ecdfd-6b03-4083-893a-2bce92d81adf">
+		<set-variable value="#[message.payload]" doc:name="garaza" doc:id="01b7a272-1ec2-4dad-8f23-9d436223d42c" variableName="garaza" />
+		<db:select doc:name="Select" doc:id="447b683f-bce1-4265-a648-77a110618c02" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblGaraza
+where Lokacija = :lokacija and
+BrojGaraze = :brojGaraze
+	  ]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"lokacija" : vars.garaza.lokacija,
+	"brojGaraze" : vars.garaza.brojGaraze
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="54c0126a-b77e-4930-91e9-81e5e0977949" value="#[payload.BrojGaraze]" />
+		<db:insert doc:name="Insert" doc:id="4a4ae529-f97f-4a52-9485-332a5135669e" config-ref="Database_Config">
+			<db:sql><![CDATA[insert into tblGaraza (lokacija, BrojGaraze)
+values (:Lokacija, :BrojGaraze);  ]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"Lokacija" : vars.garaza.lokacija,
+	"BrojGaraze" : vars.garaza.brojGaraze
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="ce25f58d-86e9-4c53-b1b7-5e7a1441ee7f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodata je nova garaza.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b79423c9-fb75-410d-a8b8-49623e4cda42" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="284a33ad-77a1-44f1-9031-493370bd88ea" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji garaza sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="ef99d4b1-1100-45d9-b74a-ed47b7bd658f" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertKarta" doc:id="c3cd809b-55ae-44d8-8ee9-71b5ff3a03dc">
+		<set-variable value="#[message.payload]" doc:name="karta" doc:id="acff178f-d973-4bb3-a737-f937c13bb1de" variableName="karta" />
+		<db:select doc:name="Select" doc:id="e621e592-5a9b-4466-9f17-f14eb38160d5" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblKarta
+where brojPerona = :brojPerona and
+brojSedista = :brojSedista and
+korisnikID = :korisnikID and
+tipKarteID = :tipKarteID and
+rutaID = :rutaID and
+autobusID = :autobusID
+	  ]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"brojPerona" : vars.karta.brojPerona,
+	"brojSedista" : vars.karta.brojSedista,
+	"korisnikID" : vars.karta.korisnikID,
+	"tipKarteID" : vars.karta.tipKarteID,
+	"rutaID" : vars.karta.rutaID,
+	"autobusID" : vars.karta.autobusID
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="596abed7-d50f-4ef0-958e-8e8f5984464f" value="#[payload.BrojPerona]" />
+		<db:insert doc:name="Insert" doc:id="fe4c8227-452d-4c01-a21a-31da84e5005a" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblKarta (BrojPerona, BrojSedista, DatumPolaska, DatumDolaska, KorisnikID, TipKarteID, RutaID, AutobusID)
+VALUES (:brojPerona, :brojSedista, :datumPolaska, :datumDolaska, :korisnikID, :tipKarteID, :rutaID, :autobusID);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"brojPerona" : vars.karta.brojPerona,
+	"brojSedista" : vars.karta.brojSedista,
+	"datumPolaska" : vars.karta.datumPolaska,
+	"datumDolaska" : vars.karta.datumDolaska,
+	"korisnikID" : vars.karta.korisnikID,
+	"tipKarteID" : vars.karta.tipKarteID,
+	"rutaID" : vars.karta.rutaID,
+	"autobusID" : vars.karta.autobusID
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="17cd2024-502d-484b-840b-e9ab0131c68d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodata je nova karta.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c836b340-66de-4b13-a630-bd4ce868905b" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="dfe22893-8363-4533-abb8-dd7f7b2f2bb3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji karta sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="cb48bca9-fd37-4cb3-a849-6044b13de14f" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertKorisnik" doc:id="12c1ad80-c0a3-43ba-afb8-0631f76e52a8">
+		<set-variable value="#[message.payload]" doc:name="korisnik" doc:id="ec608045-c6e7-4331-b43b-98d497f46261" variableName="korisnik" />
+		<db:select doc:name="Select" doc:id="23f62887-f279-4b68-bd46-ee4fc59a586f" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblKorisnik
+where jmbg = :jmbg and
+ime = :ime and
+prezime = :prezime and
+adresa = :adresa and
+grad = :grad]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.korisnik.jmbg,
+	"ime" : vars.korisnik.ime,
+	"prezime" : vars.korisnik.prezime,
+	"adresa" : vars.korisnik.adresa,
+	"grad" : vars.korisnik.grad
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="1997f2e4-8c35-4c46-a1d7-a2a6d90fa2a6" value="#[payload.JMBG]" />
+		<db:insert doc:name="Insert" doc:id="8c7e80ae-e0be-45ef-88ba-41b76a276477" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblKorisnik (JMBG, Ime, Prezime, Adresa, Grad)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.korisnik.jmbg,
+	"ime" : vars.korisnik.ime,
+	"prezime" : vars.korisnik.prezime,
+	"adresa" : vars.korisnik.adresa,
+	"grad" : vars.korisnik.grad
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="40dcd61a-ff3a-44a5-b5c6-7ec4461c93eb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodat je nov korisnik.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ce5e3316-0ee2-4d26-a6aa-7c8a02e2a20d" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="fc914c8b-b0db-4d32-a1fc-d41bfa8e02de" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji korisnik sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="5a31d88d-cbfb-4da4-87b5-c738a66fd1fe" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertRuta" doc:id="6b143359-818d-47c2-94eb-799074af3f17">
+		<set-variable value="#[message.payload]" doc:name="ruta" doc:id="bf4f2172-4e3a-4e59-b0bd-c69814d8a999" variableName="ruta" />
+		<db:select doc:name="Select" doc:id="fc11b617-9770-4bf5-93e5-aec6a63171ef" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblRuta
+where mestoDolaska = :mestoDolaska and
+mestoOdlaska = :mestoOdlaska and
+brojPosecenihStanica = :brojPosecenihStanica]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"mestoDolaska" : vars.ruta.mestoDolaska,
+	"mestoOdlaska" : vars.ruta.mestoOdlaska,
+	"brojPosecenihStanica" : vars.ruta.brojPosecenihStanica
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="c1ee41b0-4c19-4aef-802c-828649ea8052" value="#[payload.mestoDolaska]" />
+		<db:insert doc:name="Insert" doc:id="0dc92085-1773-40b4-a69e-7147d8f3d974" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblRuta (MestoDolaska, MestoOdlaska, BrojPosecenihStanica)
+VALUES (:mestoDolaska, :mestoOdlaska, :brojPosecenihStanica);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"mestoDolaska" : vars.ruta.mestoDolaska,
+	"mestoOdlaska" : vars.ruta.mestoOdlaska,
+	"brojPosecenihStanica" : vars.ruta.brojPosecenihStanica
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="bfa187c5-bde1-4ac5-b4a2-7e853962415e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodata je nova ruta.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="76ff490e-3161-4e6d-a880-73604beff856" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="7312835d-b851-4002-87a5-c7ca174b7e8b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji ruta sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="5f968e56-c25f-4d7d-8a4e-c1c0fae05fbc" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertTipKarte" doc:id="17b0da18-f54f-4e2c-9939-fbbb8c76d2a0">
+		<set-variable value="#[message.payload]" doc:name="tipKarte" doc:id="65ea0c9b-241e-4086-91a3-86d49a8d9543" variableName="tipKarte" />
+		<db:select doc:name="Select" doc:id="e35c8c74-b8e5-4001-b111-4bca16d75ec9" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblTipKarte
+where nazivKarte = :nazivKarte]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"nazivKarte" : vars.tipKarte.nazivKarte
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="9bdda24e-3b5e-4ff8-b6ea-6ab5e35f753f" value="#[payload.nazivKarte]" />
+		<db:insert doc:name="Insert" doc:id="0989cbc9-b3f4-44c8-a0d7-073efa5818dd" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblTipKarte (NazivKarte)
+VALUES (:nazivKarte);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"nazivKarte" : vars.tipKarte.nazivKarte
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="9a6e10df-81ed-44a7-aba2-468967dfa428">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodat je nov tip karte.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="477dbe9c-a6c7-486a-b16f-69b526c8cd94" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="a8b8e64b-5c0e-4b00-9996-f2014a4aab9f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji tip karte sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="e22b8a14-3f7d-4dac-aa6c-483bda185f78" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertVozac" doc:id="0332f24b-29db-483c-b3f2-655bf925606f">
+		<set-variable value="#[message.payload]" doc:name="vozac" doc:id="f3e0334a-e133-4d94-94b8-6a6ba8cc5e6d" variableName="vozac" />
+		<db:select doc:name="Select" doc:id="5233628b-8ad5-404f-b0b2-de03a2a2afd4" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblVozac
+where jmbg = :jmbg and
+  Ime = :ime and
+  Prezime = :prezime and
+  Adresa = :adresa and
+  Grad = :grad and
+  Kontakt = :kontakt]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="328a9ffd-7e3c-4fda-b9ec-7feffedc1680" value="#[payload.jmbg]" />
+		<db:insert doc:name="Insert" doc:id="4d8b2a22-ae76-494d-9c2d-02626ac8019c" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblVozac (JMBG, Ime, Prezime, Adresa, Grad, Kontakt)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad, :kontakt);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="796b57f2-cb4f-4af8-9b51-b9567aca19d8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodat je nov vozac.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2d3208c9-66f4-4c98-839c-8555ca9c6ac4" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="286d2dd6-6248-4ad4-ae96-de3599ff5e13" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji autobus sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="4f0c57c0-2c5c-428b-9a8f-e828bdfe8f16" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="insertZaposleni" doc:id="03118bfc-fae0-4ff0-991c-ac907447ca64">
+		<set-variable value="#[message.payload]" doc:name="zaposleni" doc:id="cd8f3e3a-876d-4194-af40-a30b5554eb37" variableName="zaposleni" />
+		<db:select doc:name="Select" doc:id="4db5c7b1-43ee-4cf3-96fa-246412190d80" config-ref="Database_Config">
+			<db:sql><![CDATA[select *
+from tblZaposleni
+where jmbg = :jmbg and
+  Ime = :ime and
+  Prezime = :prezime and
+  Adresa = :adresa and
+  Grad = :grad and
+  BrojSaltera = :brojSaltera and
+  Kontakt = :kontakt]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.zaposleni.jmbg,
+	"ime" : vars.zaposleni.ime,
+	"prezime" : vars.zaposleni.prezime,
+	"adresa" : vars.zaposleni.adresa,
+	"grad" : vars.zaposleni.grad,
+	"brojSaltera" : vars.zaposleni.brojSaltera,
+	"kontakt" : vars.zaposleni.kontakt
+}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-null doc:name="Is null" doc:id="0a0c6977-f4e4-40f4-98d8-9131286bc133" value="#[payload.jmbg]" />
+		<db:insert doc:name="Insert" doc:id="466eaedc-bfa6-44fa-917d-7c69c80a0c16" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO tblZaposleni (JMBG, Ime, Prezime, Adresa, Grad, BrojSaltera, Kontakt)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad, :brojSaltera, :kontakt);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"jmbg" : vars.zaposleni.jmbg,
+	"ime" : vars.zaposleni.ime,
+	"prezime" : vars.zaposleni.prezime,
+	"adresa" : vars.zaposleni.adresa,
+	"grad" : vars.zaposleni.grad,
+	"brojSaltera" : vars.zaposleni.brojSaltera,
+	"kontakt" : vars.zaposleni.kontakt
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="cb28414a-d464-40fa-8ca9-30bd50e0c091">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message : 'Dodat je novi zaposleni.'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3c1e3cb4-68b8-48db-b342-0370c07f3c58" type="ANY" >
+				<ee:transform doc:name="Transform Message" doc:id="822fb780-ae19-44bd-9d0d-26cd7d86844c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vec postoji zaposleni sa prosledjenim podacima!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="409" doc:name="Set Variable" doc:id="c2f38320-218f-4491-9ce3-484bfff4cd98" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteAutobus" doc:id="ccb02390-6b92-4110-ab2d-426019d29cc2" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="autobusID" doc:id="57dae044-b963-4ad1-8421-494c2dbf165d" variableName="autobusID" />
+		<db:select doc:name="Select" doc:id="c028c141-8599-4014-a7d2-12192f1e453f" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblAutobus
+where autobusID = :autobusID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'autobusID' : vars.autobusID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="11df1f44-cec8-49b1-ae7c-dd92d8e6dbb3" value="#[payload.autobusID]" />
+		<db:delete doc:name="Delete" doc:id="d57b7067-291b-4dc8-9fd4-e2855c1b4092" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblAutobus
+where autobusID = :autobusID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'autobusID' : vars.autobusID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="f15899c9-e4b2-4940-bc88-954b84fb26b1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Autobus je izbrisan!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8724f76d-4acb-4a2d-a5ce-51d17046bba7" >
+				<ee:transform doc:name="Transform Message" doc:id="1a5d9707-546a-4104-a4a5-8f52197b4d38" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji autobus sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="a286b39a-ddf2-4c5f-9f76-19f2916955fa" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteGaraza" doc:id="189a12e8-e123-478f-983f-5746a664a04a" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="garazaID" doc:id="4c770ed0-02c6-4caa-a287-3835ac7eba7b" variableName="garazaID" />
+		<db:select doc:name="Select" doc:id="50d52a37-3032-4e74-b018-17d21dd0ae2d" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblGaraza
+where garazaID = :garazaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'garazaID' : vars.garazaID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="7a4b09d2-5ec7-4253-a084-970427299324" value="#[payload.garazaID]" />
+		<db:delete doc:name="Delete" doc:id="bb31e1b7-1858-45c0-b2a6-3deb3bd46e1d" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblGaraza
+where garazaID = :garazaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'garazaID' : vars.garazaID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="d660a9ba-920a-4e07-af1a-96aba9f4396b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Garaza je izbrisana!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0b44a444-8e1f-4ab2-b2b4-2baae193571f" >
+				<ee:transform doc:name="Transform Message" doc:id="a37c56eb-6030-47fd-8342-22ec305935fa" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji garaza sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="6db86cbf-269b-4a99-bcbe-9beb1e843098" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteKarta" doc:id="5d702c7a-9c3b-495f-940f-2514b1a8169b" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="kartaID" doc:id="5cf5b315-d390-457e-86e0-b93ed41609d9" variableName="kartaID" />
+		<db:select doc:name="Select" doc:id="5b04784d-5c68-474d-846a-cdb3cc27658d" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblKarta
+where kartaID = :kartaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'kartaID' : vars.kartaID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="3b0eaf6e-a3ba-4917-b268-2823ee6bf7f1" value="#[payload.kartaID]" />
+		<db:delete doc:name="Delete" doc:id="f58f3fa6-a2d4-4a36-812f-197b1f84cedd" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblKarta
+where kartaID = :kartaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'kartaID' : vars.kartaID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="48082e5e-9a4e-4ed0-bcc6-7f9b83c31d7e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Karta je izbrisana!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="196cb541-f967-4098-a8fb-4217716b6e53" >
+				<ee:transform doc:name="Transform Message" doc:id="4cca2446-99e5-45c0-bb12-4e2d7b0155e2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji karta sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="65469c99-ca8e-47c4-ac45-4078e25458a0" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteKorisnik" doc:id="e366e074-630d-456c-b2b6-9cd9801a057b" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="korisnikID" doc:id="50258b0b-d44a-475f-87d9-c7c333c088a2" variableName="korisnikID" />
+		<db:select doc:name="Select" doc:id="a11a45a7-9016-44cb-9643-db9a12133aa8" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblKorisnik
+where korisnikID = :korisnikID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'korisnikID' : vars.korisnikID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="8005dc8f-fbf7-402b-88b2-dcef0b4fbda7" value="#[payload.korisnikID]" />
+		<db:delete doc:name="Delete" doc:id="5e0a00fc-8278-4dc7-b878-b003d7bfb987" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblKorisnik
+where korisnikID = :korisnikID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'korisnikID' : vars.korisnikID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="e2762d26-8de7-40ba-86d8-ba7568e284bf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Korisnik je izbrisan!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8eb58568-1d38-4475-8ca7-5c2f07c56328" >
+				<ee:transform doc:name="Transform Message" doc:id="275f3978-1a68-44d4-b26a-b1f718b18106" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji korisnik sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="759c096c-daf3-493b-8ce3-76eb5340832f" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteRuta" doc:id="7b19abc5-70fe-495f-93dd-2cadf26e4cea" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="rutaID" doc:id="304174f0-04d9-4b47-a759-dc77ddb4374f" variableName="rutaID" />
+		<db:select doc:name="Select" doc:id="8be96ca5-9629-4b86-b9a3-6d1947e64758" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblRuta
+where rutaID = :rutaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'rutaID' : vars.rutaID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="14476c4b-5cd2-4737-9bff-783e1699c35e" value="#[payload.rutaID]" />
+		<db:delete doc:name="Delete" doc:id="2a834c28-ca46-4809-b5b8-5a9d4195cc0a" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblRuta
+where rutaID = :rutaID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'rutaID' : vars.rutaID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="459af840-b795-4b11-bea0-361d4a8e361b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Ruta je izbrisana!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d96fbfe7-9397-4615-b704-87ece4f76f54" >
+				<ee:transform doc:name="Transform Message" doc:id="dd2abd8c-980a-467e-bd4c-6cd8d9deb460" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji ruta sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="f73e6591-c0c8-492a-b408-73c138afccbd" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteTipKarte" doc:id="3746da87-e2c2-47fe-bf28-58c80e2886a6" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="tipKarteID" doc:id="6110ede7-a471-41d2-b1b2-a67bd2a53e0b" variableName="tipKarteID" />
+		<db:select doc:name="Select" doc:id="8166ecce-e0d9-4e8f-bdd4-ef18c2b69dac" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblTipKarte
+where tipKarteID = :tipKarteID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'tipKarteID' : vars.tipKarteID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="f578f9d5-2fef-4fae-b09c-66145082a3f5" value="#[payload.tipKarteID]" />
+		<db:delete doc:name="Delete" doc:id="5f47d2ec-98ce-4fb1-8554-fc6616c5b947" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblTipKarte
+where tipKarteID = :tipKarteID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'tipKarteID' : vars.tipKarteID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="f84da36c-82ec-4eda-9b64-cacdf60c8e83" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Tip karte je izbrisan!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5d1f9965-be33-4432-b014-e11372ab7da8" >
+				<ee:transform doc:name="Transform Message" doc:id="d0df8937-9aed-4f28-91d5-ece7cd8baa1e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji tip karte sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="9a0ece8e-ccf1-4323-9aae-de5e015a7ef5" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteVozac" doc:id="04c562e1-eeea-4fb5-b6e6-bde89554c166" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="vozacID" doc:id="e4c92b15-41b4-4fdd-8ff9-258205f90b57" variableName="vozacID" />
+		<db:select doc:name="Select" doc:id="1a4ce30a-9df0-46f8-8138-928d02342457" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblVozac
+where vozacID = :vozacID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'vozacID' : vars.vozacID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="42619052-df62-4142-ba6e-946302b8483a" value="#[payload.vozacID]" />
+		<db:delete doc:name="Delete" doc:id="6f70ef40-3aac-4b64-8c4c-b10b449b4353" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblVozac
+where vozacID = :vozacID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'vozacID' : vars.vozacID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="6fe9a1bf-03e1-4e44-a801-e78deffddee3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vozac je izbrisan!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1a525005-2a20-456c-b5ae-20425737500c" >
+				<ee:transform doc:name="Transform Message" doc:id="4321e3c0-3057-448c-96e0-57aa23873435" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji vozac sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="f2981887-c958-493b-b8cb-d636e582f707" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteZaposleni" doc:id="23ecafb5-07f9-4152-87aa-545e7f2c7d4a" >
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="zaposleniID" doc:id="30cb2438-8fb6-4fac-a149-340dbb25d5ce" variableName="zaposleniID" />
+		<db:select doc:name="Select" doc:id="907728cc-7ea9-4db6-9803-78e720aa88fb" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * 
+from tblZaposleni
+where zaposleniID = :zaposleniID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'zaposleniID' : vars.zaposleniID}]]]></db:input-parameters>
+		</db:select>
+		<validation:is-not-null doc:name="Is not null" doc:id="c411b72b-6aa1-4645-a64e-435213b6a81f" value="#[payload.zaposleniID]" />
+		<db:delete doc:name="Delete" doc:id="0b3e0c68-a6b9-4241-b6c2-eb68c16fc7eb" config-ref="Database_Config" >
+			<db:sql ><![CDATA[delete from tblZaposleni
+where zaposleniID = :zaposleniID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'zaposleniID' : vars.zaposleniID}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="03dcfc06-fcdb-4bc6-932e-61845dd5b167" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Zaposleni je izbrisan!'
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="00af0c10-5fee-46b3-a9c2-92b020eca8a4" >
+				<ee:transform doc:name="Transform Message" doc:id="20e9f581-39b5-4e9d-a085-f6cb3e9c8c61" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	message: 'Ne postoji zaposleni sa datim ID-jem'
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="ce716a6b-189a-4f8b-83f6-6d9f221a63ee" variableName="httpStatus" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="updateAutobus" doc:id="2dc412fa-e76f-44e4-86df-98b2287b7983" >
+		<set-variable value="#[message.payload]" doc:name="autobus" doc:id="fb4bfc6b-a453-455b-87bf-ef428f4671d0" variableName="autobus" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="b0d62620-eb24-4205-a2e1-b756f4faa6dc" variableName="ID" />
+		<db:select doc:name="Select" doc:id="bb4a55f2-68eb-4c59-996b-a764359ed9bc" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblAutobus
+where autobusID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="d3d3b00d-7cb5-4320-b962-08d6bae08b42" >
+			<when expression="#[payload.autobusID != null]" >
+				<db:select doc:name="Select" doc:id="6a10b9da-2aec-4f0b-a0fa-822127b33f34" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblAutobus
+where Prevoznik = :Prevoznik and
+TipAutobusa = :TipAutobusa and
+brojSedista = :BrojSedista
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"Prevoznik" : vars.autobus.prevoznik,
+	"TipAutobusa" : vars.autobus.tipAutobusa, 
+	"BrojSedista" : vars.autobus.brojSedista
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="3f0ba83a-ea26-416a-84d3-b678c9b484b0" value="#[payload.autobusID]"/>
+				<db:update doc:name="Update" doc:id="441c24b4-c532-4f64-a86f-f226ddd31907" config-ref="Database_Config">
+					<db:sql><![CDATA[update tblAutobus
+set Prevoznik = :Prevoznik,
+TipAutobusa = :TipAutobusa,
+brojSedista = :BrojSedista
+where autobusID = :AutobusID
+	  ]]></db:sql>
+					<db:input-parameters><![CDATA[#[{
+	"Prevoznik" : vars.autobus.prevoznik,
+	"TipAutobusa" : vars.autobus.tipAutobusa, 
+	"BrojSedista" : vars.autobus.brojSedista,
+	"AutobusID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="f665fdc1-3c7c-4054-a602-61844fb629a5" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="3d5037a2-d5f6-4841-8f01-82d7bd97303d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Autobus je izmenjen!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="fa5bf27b-c72b-4549-98c1-1fbbcc273549" config-ref="Database_Config" >
+					<db:sql ><![CDATA[insert into tblAutobus (Prevoznik, TipAutobusa, BrojSedista)
+	values (:Prevoznik, :TipAutobusa, :BrojSedista);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"Prevoznik" : vars.autobus.prevoznik,
+	"TipAutobusa" : vars.autobus.tipAutobusa, 
+	"BrojSedista" : vars.autobus.brojSedista
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="6d5294f0-aad7-4ebb-805f-b57cad783865" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="dddfddfa-1dac-4dde-9b08-b94650b03707" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodat je novi autobus.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateGaraza" doc:id="87f968bb-365a-4ffb-a396-f4c2c270b649" >
+		<set-variable value="#[message.payload]" doc:name="garaza" doc:id="cd764840-78a7-4f92-8fd6-b3e42e65985c" variableName="garaza" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="79b5eae6-8630-4630-9c1e-0431202faebf" variableName="ID" />
+		<db:select doc:name="Select" doc:id="59b1a047-4c23-474f-9071-52b3caea22be" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblGaraza
+where garazaID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="1e0e7ef9-a0be-41ba-bdb0-f0676be36a33" >
+			<when expression="#[payload.garazaID != null]" >
+				<db:select doc:name="Select" doc:id="0ee690b9-b02c-4ffa-8a52-7123e1092dca" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblGaraza
+where Lokacija = :lokacija and
+BrojGaraze = :brojGaraze
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"lokacija" : vars.garaza.lokacija,
+	"brojGaraze" : vars.garaza.brojGaraze
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="fdce1659-62a3-43f6-96c3-5957bde7907a" value="#[payload.garazaID]" />
+				<db:update doc:name="Update" doc:id="acd37031-d827-4e4f-a189-865b88252f34" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblGaraza
+set Lokacija = :lokacija,
+BrojGaraze = :brojGaraze
+where garazaID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"lokacija" : vars.garaza.lokacija,
+	"brojGaraze" : vars.garaza.brojGaraze,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="d441ec43-a34c-4428-a5b6-46a9f45d9ac0" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="09498b09-36d2-4cb9-84ef-e8fb50f95eeb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Garaza je izmenjena!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="1c674dcc-5d6e-4555-b96f-0bbe91b052c8" config-ref="Database_Config" >
+					<db:sql ><![CDATA[insert into tblGaraza (lokacija, BrojGaraze)
+values (:Lokacija, :BrojGaraze);  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"Lokacija" : vars.garaza.lokacija,
+	"BrojGaraze" : vars.garaza.brojGaraze
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="bcd656b0-7e07-447e-87f5-10c8f907d6ea" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="f75ff7a5-269f-4791-834a-359d9c63d82e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodata je nova garaza.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateKarta" doc:id="3118cdf3-db5b-4eae-af88-56feab6cede3" >
+		<set-variable value="#[message.payload]" doc:name="karta" doc:id="47788a00-dc75-4032-84c9-290cf38fbf3e" variableName="karta" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="2bbf569d-fb51-4ec8-afb0-9f8175cd5f85" variableName="ID" />
+		<db:select doc:name="Select" doc:id="35aeeef4-7132-4df2-8147-5b388638dd69" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblKarta
+where kartaID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="7ae458c4-3464-4868-832b-16b11229b259" >
+			<when expression="#[payload.kartaID != null]" >
+				<db:select doc:name="Select" doc:id="bcca4b18-61de-461b-be5e-17353daf1ebf" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblKarta
+where brojPerona = :brojPerona and
+brojSedista = :brojSedista and
+korisnikID = :korisnikID and
+tipKarteID = :tipKarteID and
+rutaID = :rutaID and
+autobusID = :autobusID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"brojPerona" : vars.karta.brojPerona,
+	"brojSedista" : vars.karta.brojSedista,
+	"korisnikID" : vars.karta.korisnikID,
+	"tipKarteID" : vars.karta.tipKarteID,
+	"rutaID" : vars.karta.rutaID,
+	"autobusID" : vars.karta.autobusID
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="004f02a5-422d-475a-ab05-81085877f1c0" value="#[payload.kartaID]" />
+				<db:update doc:name="Update" doc:id="49086db6-3ab6-4c7b-81d4-7cd5650889bb" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblKarta
+set brojPerona = :brojPerona,
+brojSedista = :brojSedista,
+korisnikID = :korisnikID,
+tipKarteID = :tipKarteID,
+rutaID = :rutaID,
+autobusID = :autobusID
+where kartaID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"brojPerona" : vars.karta.brojPerona,
+	"brojSedista" : vars.karta.brojSedista,
+	"korisnikID" : vars.karta.korisnikID,
+	"tipKarteID" : vars.karta.tipKarteID,
+	"rutaID" : vars.karta.rutaID,
+	"autobusID" : vars.karta.autobusID,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="906497fa-0585-498b-b0de-1a15f55b2b9b" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="46117841-d7dd-44ec-96d4-f43d627ca6ba" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Karta je izmenjena!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="c7bdfef1-92e8-449e-9bb8-7c687f04457c" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblKarta (BrojPerona, BrojSedista, DatumPolaska, DatumDolaska, KorisnikID, TipKarteID, RutaID, AutobusID)
+VALUES (:brojPerona, :brojSedista, :datumPolaska, :datumDolaska, :korisnikID, :tipKarteID, :rutaID, :autobusID);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"brojPerona" : vars.karta.brojPerona,
+	"brojSedista" : vars.karta.brojSedista,
+	"datumPolaska" : vars.karta.datumPolaska,
+	"datumDolaska" : vars.karta.datumDolaska,
+	"korisnikID" : vars.karta.korisnikID,
+	"tipKarteID" : vars.karta.tipKarteID,
+	"rutaID" : vars.karta.rutaID,
+	"autobusID" : vars.karta.autobusID
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="30f8bfea-0cd1-48e8-9c2b-effe7d7fbada" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="8548838d-a6a8-46db-9ac4-db1c299da9f3" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodata je nova karta.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateKorisnik" doc:id="ad381f2a-34df-4eb0-bcff-118bb9477efe" >
+		<set-variable value="#[message.payload]" doc:name="korisnik" doc:id="abee0fc5-445c-4803-a49d-741a50b56394" variableName="korisnik" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="c8c08fae-6bc5-49da-bd2e-9c1dbe0c563a" variableName="ID" />
+		<db:select doc:name="Select" doc:id="ef45448c-847b-4766-b4ea-2634abcaa642" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblKorisnik
+where korisnikID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="ec5963e3-bc23-4942-a808-4e544a838242" >
+			<when expression="#[payload.korisnikID != null]" >
+				<db:select doc:name="Select" doc:id="f0117d65-da86-4578-be3a-d2df7f049983" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblKorisnik
+where jmbg = :jmbg and
+ime = :ime and
+prezime = :prezime and
+adresa = :adresa and
+grad = :grad
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.korisnik.jmbg,
+	"ime" : vars.korisnik.ime,
+	"prezime" : vars.korisnik.prezime,
+	"adresa" : vars.korisnik.adresa,
+	"grad" : vars.korisnik.grad
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="25235d46-3528-4119-b6c5-ff673e82a1f9" value="#[payload.korisnikID]" />
+				<db:update doc:name="Update" doc:id="1ea81d57-dbb1-488b-81ae-63c3a0f7d693" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblKarta
+set jmbg = :jmbg,
+ime = :ime,
+prezime = :prezime,
+adresa = :adresa,
+grad = :grad
+where korisnikID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.korisnik.jmbg,
+	"ime" : vars.korisnik.ime,
+	"prezime" : vars.korisnik.prezime,
+	"adresa" : vars.korisnik.adresa,
+	"grad" : vars.korisnik.grad,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="13e84ece-e9b2-4772-952d-1f684949b7ba" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="9d6ad1bb-afa0-4aa5-b9e4-0dca82b6c099" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Korisnik je izmenjen!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="2c40a382-ef7b-4c29-8b21-5caf8b2c6b89" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblKorisnik (JMBG, Ime, Prezime, Adresa, Grad)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.korisnik.jmbg,
+	"ime" : vars.korisnik.ime,
+	"prezime" : vars.korisnik.prezime,
+	"adresa" : vars.korisnik.adresa,
+	"grad" : vars.korisnik.grad
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="17dfdc92-32c5-45ec-8046-ffb266fbefdb" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="d770a0ec-4b4a-4850-b0b5-fb9a1493c6c7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodat je novi korisnik.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateRuta" doc:id="4329d8c4-b5dc-42a0-9c4f-0e3c2042d406" >
+		<set-variable value="#[message.payload]" doc:name="ruta" doc:id="83ab6259-80a2-4ff2-abef-31f268bc1072" variableName="ruta" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="b14cf485-96a0-44cc-a7da-f8cb23eca9de" variableName="ID" />
+		<db:select doc:name="Select" doc:id="8539f6b5-46b2-4d59-819c-851811fa55bc" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblRuta
+where rutaID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="1cc4e868-5204-432d-bd69-f823b6ab00e8" >
+			<when expression="#[payload.rutaID != null]" >
+				<db:select doc:name="Select" doc:id="3a2dfdb9-f1f8-4ddd-979f-8a77b705936f" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblRuta
+where mestoDolaska = :mestoDolaska and
+mestoOdlaska = :mestoOdlaska and
+brojPosecenihStanica = :brojPosecenihStanica]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"mestoDolaska" : vars.ruta.mestoDolaska,
+	"mestoOdlaska" : vars.ruta.mestoOdlaska,
+	"brojPosecenihStanica" : vars.ruta.brojPosecenihStanica
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="c7535de7-bc0e-4445-95b0-0b00ebf04abb" value="#[payload.rutaID]" />
+				<db:update doc:name="Update" doc:id="868c93f7-c991-4b31-a534-6f44bb076f5b" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblRuta
+set mestoDolaska = :mestoDolaska,
+mestoOdlaska = :mestoOdlaska,
+brojPosecenihStanica = :brojPosecenihStanica
+where rutaID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"mestoDolaska" : vars.ruta.mestoDolaska,
+	"mestoOdlaska" : vars.ruta.mestoOdlaska,
+	"brojPosecenihStanica" : vars.ruta.brojPosecenihStanica,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="e64fa49d-b6d1-4ad5-9d0f-f6194a2d746f" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="9dccb7fe-c056-45d5-96cd-9aab1ffecb52" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Ruta je izmenjena!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="caf98e22-cae6-4a65-a7bc-8ab4820b66b9" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblRuta (MestoDolaska, MestoOdlaska, BrojPosecenihStanica)
+VALUES (:mestoDolaska, :mestoOdlaska, :brojPosecenihStanica);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"mestoDolaska" : vars.ruta.mestoDolaska,
+	"mestoOdlaska" : vars.ruta.mestoOdlaska,
+	"brojPosecenihStanica" : vars.ruta.brojPosecenihStanica
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="3c2a9d55-4f38-4e18-92e7-f11dc5e8e97f" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="c1cd895f-3d64-4504-936c-6618b4492906" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodata je nova ruta.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateTipKarte" doc:id="f23cfebb-7ad2-4141-b7a5-a33c8c2559fa" >
+		<set-variable value="#[message.payload]" doc:name="tipKarte" doc:id="96c43b77-d786-41b6-a63f-e144ee1a51c5" variableName="tipKarte" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="b683a4c7-323b-497d-ae58-e787ca684d10" variableName="ID" />
+		<db:select doc:name="Select" doc:id="240f740b-412d-43e3-b631-c2c3c9a483b4" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblTipKarte
+where tipKarteID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="7451d45c-48be-493a-bff2-6c21c9410755" >
+			<when expression="#[payload.tipKarteID != null]" >
+				<db:select doc:name="Select" doc:id="c8a36ee7-6ee3-4f35-be90-bde211e52f9c" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblTipKarte
+where nazivKarte = :nazivKarte]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"nazivKarte" : vars.tipKarte.nazivKarte
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="dcf7024d-967c-4021-849d-28cef0f99f59" value="#[payload.tipKarteID]" />
+				<db:update doc:name="Update" doc:id="d0fbc6de-e526-4580-bc64-a7b213c9d891" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblTipKarte
+set nazivKarte = :nazivKarte
+where tipKarteID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"nazivKarte" : vars.tipKarte.nazivKarte,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="13f43961-77b3-409b-8f54-431005de5ba5" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="8a58c5f1-e915-499f-bf3a-3f359d3c8d89" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Tip karte je izmenjen!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="8ac862df-c9b3-4039-bf10-a6b0dfca04f8" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblTipKarte (NazivKarte)
+VALUES (:nazivKarte);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"nazivKarte" : vars.tipKarte.nazivKarte
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="837ae141-4a20-4be2-9fa1-3c6793d5e783" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="7ef05b56-aeaa-4eb3-9a92-0c34349332e5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodat je novi tip karte.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateVozac" doc:id="bb758047-68d5-4133-9bd9-c15064861e48" >
+		<set-variable value="#[message.payload]" doc:name="vozac" doc:id="b1f261f5-8335-4ae9-a4ad-e7b84696c642" variableName="vozac" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="65cc0d42-cd42-4b7f-a499-3efd7a371ba9" variableName="ID" />
+		<db:select doc:name="Select" doc:id="71f19138-5d31-446f-a743-fc8b302846f3" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblVozac
+where vozacID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="365c3ff9-12d3-4d27-a520-2717180b0994" >
+			<when expression="#[payload.vozacID != null]" >
+				<db:select doc:name="Select" doc:id="aaffb352-e43c-4549-908a-fb0bbce16bcb" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblVozac
+where jmbg = :jmbg and
+  Ime = :ime and
+  Prezime = :prezime and
+  Adresa = :adresa and
+  Grad = :grad and
+  Kontakt = :kontakt]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="f731377d-fd67-4473-b319-07b97310caff" value="#[payload.vozacID]" />
+				<db:update doc:name="Update" doc:id="414f8ccf-6875-4cb3-9ce8-1c4e448b371a" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblVozac
+set jmbg = :jmbg,
+  Ime = :ime,
+  Prezime = :prezime,
+  Adresa = :adresa,
+  Grad = :grad,
+  Kontakt = :kontakt
+where vozacID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="f8ec732b-8a6a-428f-9f01-826bc2f99291" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="5742f67f-59e1-44d4-b5f6-efe0b0e48adc" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Vozac je izmenjen!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="bc6ab019-1805-4f04-8e6d-0cc887a59bf1" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblVozac (JMBG, Ime, Prezime, Adresa, Grad, Kontakt)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad, :kontakt);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="6a2a1d36-d553-4992-90c7-077bf19f84a5" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="2d9c425b-dd0c-4607-a430-38a99f3ce78e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodat je novi vozac.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="updateZaposleni" doc:id="d19e130e-333c-4457-87ee-59fa245c19ad" >
+		<set-variable value="#[message.payload]" doc:name="zaposleni" doc:id="f67be39a-12fc-45db-b722-e66917840af3" variableName="zaposleni" />
+		<set-variable value="#[message.attributes.uriParams.ID]" doc:name="ID" doc:id="fcc3dfed-0e18-4165-bfea-6eda87db6290" variableName="ID" />
+		<db:select doc:name="Select" doc:id="c3afa3bf-fc2a-470c-89a8-d097aef57aea" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select *
+from tblZaposleni
+where zaposleniID = :ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID' : vars.ID}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="0faa909d-610b-46da-b654-88de35fc574a" >
+			<when expression="#[payload.zaposleniID != null]" >
+				<db:select doc:name="Select" doc:id="3fae5391-5412-45df-a1bd-343fb37f8550" config-ref="Database_Config" >
+					<db:sql ><![CDATA[select *
+from tblZaposleni
+where jmbg = :jmbg and
+  Ime = :ime and
+  Prezime = :prezime and
+  Adresa = :adresa and
+  Grad = :grad and
+  BrojSaltera = :brojSaltera and
+  Kontakt = :kontakt]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.zaposleni.jmbg,
+	"ime" : vars.zaposleni.ime,
+	"prezime" : vars.zaposleni.prezime,
+	"adresa" : vars.zaposleni.adresa,
+	"grad" : vars.zaposleni.grad,
+	"brojSaltera" : vars.zaposleni.brojSaltera,
+	"kontakt" : vars.zaposleni.kontakt
+}]]]></db:input-parameters>
+				</db:select>
+				<validation:is-null doc:name="Is null" doc:id="48a7c66d-8008-48e1-b170-da70a8bce797" value="#[payload.zaposleniID]" />
+				<db:update doc:name="Update" doc:id="f9618a6a-aeb0-402a-8db6-634e0bdc22e3" config-ref="Database_Config" >
+					<db:sql ><![CDATA[update tblZaposleni
+set jmbg = :jmbg,
+  Ime = :ime,
+  Prezime = :prezime,
+  Adresa = :adresa,
+  Grad = :grad,
+  BrojSaltera = :brojSaltera,
+  Kontakt = :kontakt
+where zaposleniID = :ID
+	  ]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.vozac.jmbg,
+	"ime" : vars.vozac.ime,
+	"prezime" : vars.vozac.prezime,
+	"adresa" : vars.vozac.adresa,
+	"grad" : vars.vozac.grad,
+	"kontakt" : vars.vozac.kontakt,
+	"ID" : vars.ID
+}]]]></db:input-parameters>
+				</db:update>
+				<set-variable value="200" doc:name="httpStatus" doc:id="2128893f-9edd-43a7-ba59-9e384aabb355" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="4764e521-861b-48ab-b9e3-7629b7c7d19d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Zaposleni je izmenjen!'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="c01f983f-88ff-47f4-9b8c-dacc662fff05" config-ref="Database_Config" >
+					<db:sql ><![CDATA[INSERT INTO tblZaposleni (JMBG, Ime, Prezime, Adresa, Grad, BrojSaltera, Kontakt)
+VALUES (:jmbg, :ime, :prezime, :adresa, :grad, :brojSaltera, :kontakt);]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	"jmbg" : vars.zaposleni.jmbg,
+	"ime" : vars.zaposleni.ime,
+	"prezime" : vars.zaposleni.prezime,
+	"adresa" : vars.zaposleni.adresa,
+	"grad" : vars.zaposleni.grad,
+	"brojSaltera" : vars.zaposleni.brojSaltera,
+	"kontakt" : vars.zaposleni.kontakt
+}]]]></db:input-parameters>
+				</db:insert>
+				<set-variable value="201" doc:name="httpStatus" doc:id="1e9a1f3d-9ee9-46fa-b092-d8ee40d1d2fe" variableName="httpStatus" />
+				<ee:transform doc:name="Transform Message" doc:id="3ec47190-da46-44ce-a9b1-cc2af061fa41" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Dodat je novi zaposleni.'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="kartaERP" doc:id="3f2cb12e-56b5-480b-b49f-717fb7d3fb9d">
+		<db:listener table="tblkarta" doc:name="On Table Row" doc:id="898873b8-83b5-4b41-9b5a-7b92e7493626" config-ref="Database_Config" watermarkColumn="TipKarteID" idColumn="TipKarteID">
+			<scheduling-strategy>
+				<fixed-frequency />
+			</scheduling-strategy>
+		</db:listener>
+		<choice doc:name="Choice" doc:id="08ae6e38-6b20-4510-9a3a-7f3f8807b7c1">
+			<when expression="#[payload.TipKarteID == 1]">
+				<ee:transform doc:name="Transform Message" doc:id="9184c18a-9869-426a-9747-8750f3f748f2">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<file:write doc:id="8dbb358e-05c8-4a65-949a-423d414ee65b" config-ref="MongolianERP" path="mongolianERP\mongolianERP.json" mode="APPEND" doc:name="mongolianERP" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="8a5c9cfd-c1b9-4860-a725-8ba7b5602f2e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	root: 
+	{
+			kartaID: payload.kartaID,
+			brojPerona: payload.brojPerona,
+			brojSedista: payload.brojSedista,
+			datumPolaska: payload.datumPolaska,
+			datumDolaska: payload.datumDolaska,
+			korisnikID: payload.korisnikID,
+			tipKarteID: payload.TipKarteID,
+			rutaID: payload.RutaID,
+			autobusID: payload.AutobusID
+			
+	}
+} ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<file:write doc:id="1e2e40b6-293d-4d06-a007-146545c04870" config-ref="InternalERP" path="internalERP\internalERP.xml" mode="APPEND" doc:name="internal ERP " />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

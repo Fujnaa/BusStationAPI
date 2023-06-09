@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="a80830b0-6cdb-4867-b645-6cc92ee86e26" >
+		<db:my-sql-connection host="${db.Host}" port="${db.Port}" user="${db.User}" password="mule123" database="${db.Database}" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a8401ca9-0fe7-499e-93d5-4c561b38f4e0" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="3353ebfc-bbaf-46a3-b9a0-a94c050fa961" file="config.yaml" />
+	<file:config name="MongolianERP" doc:name="File Config" doc:id="ca54b0e0-3fc1-47f9-bde4-dd40fc41ce8e" >
+		<file:connection workingDir="C:\Users\Fujnaa\AnypointStudio\studio-workspace\autobuska_stanica\src\main\resources\mongolianERP" />
+	</file:config>
+	<file:config name="InternalERP" doc:name="File Config" doc:id="7df4a1dd-0981-4dd7-ab2f-d7f201f9713c" >
+		<file:connection workingDir="C:\Users\Fujnaa\AnypointStudio\studio-workspace\autobuska_stanica\src\main\resources\internalERP" />
+	</file:config>
+</mule>

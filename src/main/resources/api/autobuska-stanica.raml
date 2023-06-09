@@ -1,0 +1,457 @@
+#%RAML 1.0
+title: Autobuska Stanica
+
+types:
+  Autobus: !include /dataTypes/AutobusDataType.raml
+  Garaza: !include /dataTypes/GarazaDataType.raml
+  Karta: !include /dataTypes/KartaDataType.raml
+  Korisnik: !include /dataTypes/KorisnikDataType.raml
+  Ruta: !include /dataTypes/RutaDataType.raml
+  TipKarte: !include /dataTypes/TipKarteDataType.raml
+  Vozac: !include /dataTypes/VozacDataType.raml
+  Zaposleni: !include /dataTypes/ZaposleniDataType.raml
+
+/autobus:
+  get:
+    queryParameters:
+      prevoznik:
+        required: false
+
+      tipAutobusa:
+        required: false
+        
+      brojSedista:
+        required: false
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: Autobus[]
+            examples:
+              output: !include /examples/Autobus/AutobusExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Autobus
+        examples:
+          input: !include /examples/Autobus/AutobusNoIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:
+            examples:
+              message: Autobus dodat (ali ne zapravo)
+
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Autobus
+              examples:
+                output: !include /examples/Autobus/AutobusIDExample.raml
+
+    
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Autobus je obrisan (Ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Autobus/AutobusExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Autobus azuriran (ali ne zapravo)
+
+
+/garaza:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Garaza[]
+            examples:
+              output: !include /examples/Garaza/GarazaExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Garaza
+        examples:
+              output: !include /examples/Garaza/GarazaIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Garaza dodata (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Garaza
+              examples:
+                output: !include /examples/Garaza/GarazaNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisana garaza (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Garaza/GarazaExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Garaza azurirana (ali ne zapravo)
+
+/karta:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Karta[]
+            examples:
+              output: !include /examples/Karta/KartaExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Karta
+        examples:
+              output: !include /examples/Karta/KartaIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Karta dodata (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Karta
+              examples:
+                output: !include /examples/Karta/KartaNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisana karta (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Karta/KartaExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Karta azurirana (ali ne zapravo)
+
+/korisnik:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Korisnik[]
+            examples:
+              output: !include /examples/Korisnik/KorisnikExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Korisnik
+        examples:
+              output: !include /examples/Korisnik/KorisnikIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Korisnik dodat (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Korisnik
+              examples:
+                output: !include /examples/Korisnik/KorisnikNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisan korisnik (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Korisnik/KorisnikExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Korisnik azuriran (ali ne zapravo)
+
+/ruta:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Ruta[]
+            examples:
+              output: !include /examples/Ruta/RutaExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Ruta
+        examples:
+              output: !include /examples/Ruta/RutaIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Ruta dodata (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Ruta
+              examples:
+                output: !include /examples/Ruta/RutaNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisana ruta (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Ruta/RutaExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Ruta azurirana (ali ne zapravo)
+
+/tipKarte:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: TipKarte[]
+            examples:
+              output: !include /examples/TipKarte/TipKarteExample.raml
+
+  post:
+    body:
+      application/json:
+        type: TipKarte
+        examples:
+              output: !include /examples/TipKarte/TipKarteIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Tip karte dodat (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: TipKarte
+              examples:
+                output: !include /examples/TipKarte/TipKarteNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisan tip karte (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/TipKarte/TipKarteExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: TipKarte azuriran (ali ne zapravo)
+
+/vozac:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Vozac[]
+            examples:
+              output: !include /examples/Vozac/VozacExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Vozac
+        examples:
+          output: !include /examples/Vozac/VozacIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Vozac dodat (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Vozac
+              examples:
+                output: !include /examples/Vozac/VozacNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisan vozac (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Vozac/VozacExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Vozac azuriran (ali ne zapravo)
+
+/zaposleni:
+  get:
+    responses:
+      200:
+        body:
+          application/json:
+            type: Zaposleni[]
+            examples:
+              output: !include /examples/Zaposleni/ZaposleniExample.raml
+
+  post:
+    body:
+      application/json:
+        type: Zaposleni
+        examples:
+          output: !include /examples/Zaposleni/ZaposleniIDExample.raml
+    responses:
+      201:
+        body:
+          application/json:     
+            example:
+              message: Zaposleni dodat (Ali ne stvarno)
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: Zaposleni
+              examples:
+                output: !include /examples/Zaposleni/ZaposleniNoIDExample.raml
+
+    delete:
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                message: Uspesno obrisan zaposleni (ali ne stvarno)
+
+    put:
+      body:
+        application/json:
+          type : Autobus
+          example:
+            input: !include /examples/Zaposleni/ZaposleniExample.raml
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                message: Zaposleni azuriran (ali ne zapravo)

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_c48d5e81_ef56_4d4c_b8b1_5d3fc80c5112_Output_Payload = Array<{|  KartaID: Number,   BrojPerona: String,   BrojSedista: String,   DatumPolaska: Date,   DatumDolaska: Date,   KorisnikID?: Number,   TipKarteID?: Number,   RutaID?: Number,   AutobusID?: Number|}>
+

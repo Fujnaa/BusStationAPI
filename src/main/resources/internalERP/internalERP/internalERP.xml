@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <kartaID>2</kartaID>
+  <brojPerona>P2</brojPerona>
+  <brojSedista>B1</brojSedista>
+  <datumPolaska>2023-06-11T00:00:00</datumPolaska>
+  <datumDolaska>2023-06-12T00:00:00</datumDolaska>
+  <korisnikID>2</korisnikID>
+  <tipKarteID>2</tipKarteID>
+  <rutaID>2</rutaID>
+  <autobusID>6</autobusID>
+</root>

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_a5ea98ae_610b_4069_a437_17e18a306807_Output_Payload = Array<{|  GarazaID: Number,   Lokacija: String,   BrojGaraze?: String|}>
+

@@ -1,0 +1,10 @@
+http:
+  port: "8081" 
+  
+db: 
+  Host: "localhost"
+  Port: "3306"
+  User: mule
+  Password: mule123
+  Database: "Autobuska_Stanica"
+  

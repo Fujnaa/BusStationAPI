@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+	<apikit:config outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="Router" doc:id="c65c79ec-44c7-4ce9-b41d-126c549470a0" name="Autobuska_Stanica-config" api="api\autobuska-stanica.raml" disableValidations="true" parser="RAML">
+		<apikit:flow-mappings >
+			<apikit:flow-mapping resource="/vozac/{ID}" action="get" flow-ref="get:\vozac\(ID):Autobuska_Stanica-config1" />
+			<apikit:flow-mapping resource="/karta/{ID}" action="get" flow-ref="get:\karta\(ID):Autobuska_Stanica-config" />
+			<apikit:flow-mapping resource="/korisnik/{ID}" action="get" flow-ref="get:\korisnik\(ID):Autobuska_Stanica-config1" />
+			<apikit:flow-mapping resource="/zaposleni/{ID}" action="get" flow-ref="get:\zaposleni\(ID):Autobuska_Stanica-config1" />
+			<apikit:flow-mapping resource="/autobus" action="post" content-type="application/json" flow-ref="post:\autobus:application\json:Autobuska_Stanica-config" />
+			<apikit:flow-mapping resource="/autobus/{ID}" action="delete" flow-ref="delete:\autobus\(ID):Autobus_Stanica-config" />
+			<apikit:flow-mapping resource="/garaza/{ID}" action="delete" flow-ref="delete:\garaza\(ID):Autobus_Stanica-config" />
+			<apikit:flow-mapping resource="/karta/{ID}" action="delete" flow-ref="delete:\karta\(ID):Autobus_Stanica-config1" />
+			<apikit:flow-mapping resource="/korisnik/{ID}" action="delete" flow-ref="delete:\korisnik\(ID):Autobus_Stanica-config" />
+			<apikit:flow-mapping resource="/ruta/{ID}" action="delete" flow-ref="delete:\ruta\(ID):Autobus_Stanica-config1" />
+			<apikit:flow-mapping resource="/tipKarte/{ID}" action="delete" flow-ref="delete:\tipKarte\(ID):Autobus_Stanica-config" />
+			<apikit:flow-mapping resource="/vozac/{ID}" action="delete" flow-ref="delete:\vozac\(ID):Autobus_Stanica-config1" />
+			<apikit:flow-mapping resource="/zaposleni/{ID}" action="delete" flow-ref="delete:\zaposleni\(ID):Autobus_Stanica-config" />
+			<apikit:flow-mapping resource="/garaza" action="post" content-type="application/json" flow-ref="post:\garaza:application\json:Autobuska_Stanica-config" />
+		</apikit:flow-mappings>
+	</apikit:config>
+	<flow name="interfaceFlow" doc:id="57fda695-73f0-4683-b9aa-20da2a3ce07a" >
+		<http:listener doc:name="Listener" doc:id="8c791a67-98dc-4940-9f5a-43481ee0552c" path="/api/*" config-ref="HTTP_Listener_config"/>
+		<apikit:router doc:name="APIkit Router" doc:id="c42e3fdf-6149-4e7a-93f8-6439b35e82bb" config-ref="Autobuska_Stanica-config"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e45fe9cb-05f4-4d3c-9e3a-98edde492886" type="APIKIT:BAD_REQUEST" >
+				<ee:transform doc:name="Transform Message" doc:id="0236260a-a8a5-4f42-b341-c7fb1bc0540d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate1" doc:id="c25f2e68-c866-4cc8-a3d4-45d05df43cf6" type="APIKIT:NOT_FOUND" >
+				<ee:transform doc:name="Transform Message" doc:id="8797641c-ddd2-43c0-8706-0e532c6d3955" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate2" doc:id="bde660e3-7698-4d59-a839-9d6b7ad33f73" type="APIKIT:METHOD_NOT_ALLOWED" >
+				<ee:transform doc:name="Transform Message" doc:id="60b5239a-c2b5-47c7-b01d-bb077dbd507e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate3" doc:id="78d2286e-5149-413b-9fab-ee1e731ee717" type="APIKIT:NOT_ACCEPTABLE" >
+				<ee:transform doc:name="Transform Message" doc:id="bb642ab2-10ec-4321-9447-d917f8551e0c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate4" doc:id="9da67fe6-0c7a-4837-8783-7f3fbea15215" type="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+				<ee:transform doc:name="Transform Message" doc:id="26613a82-90b6-46b6-84ec-2d5d785d652d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate5" doc:id="abfd06c2-a930-4ef4-98f8-595f49cfb90d" type="APIKIT:NOT_IMPLEMENTED" >
+				<ee:transform doc:name="Transform Message" doc:id="1aa32e71-4bc9-4bb3-be2e-1bd35581d746" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="Autobuska_Stanica-console" doc:id="d16bd409-925f-4909-a53e-41b9c3529c84">
+		<http:listener doc:name="Listener" doc:id="82a08d5c-ac52-46aa-ad1e-f62cd48e3624" config-ref="HTTP_Listener_config" path="/console/*">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console doc:name="APIkit Console" doc:id="831f8e76-e3e7-4c87-9ec2-e2d9b7bfff64" config-ref="Autobuska_Stanica-config" />
+		<error-handler>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df2b495e-89f8-4f5b-a9ea-a272205a66b1" type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message" doc:id="36657f87-2dfd-4b3b-a173-c77c18759f17">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\autobus:Autobuska_Stanica-config" doc:id="3fd7fa52-24d9-4534-b339-db01534f0932" >
+		<flow-ref doc:name="getAllAutobus" doc:id="4ac35fe9-5342-42fa-adac-c466d265de76" name="getAllAutobus"/>
+	</flow>
+	<flow name="get:\vozac:Autobuska_Stanica-config" doc:id="7f9207f4-bff9-45a7-93bf-8822ee87d0ad" >
+		<flow-ref doc:name="getAllVozac" doc:id="4d04931a-0db4-4eff-8c36-9126f35ecbbc" name="getAllVozac" />
+	</flow>
+	<flow name="get:\garaza:Autobuska_Stanica-config" doc:id="e5042d69-f486-4a68-a08a-99b1965817b4" >
+		<flow-ref doc:name="getAllGaraza" doc:id="ca9b39ee-cc4c-40a1-995c-390c8a27663f" name="getAllGaraza" />
+	</flow>
+	<flow name="get:\karta:Autobuska_Stanica-config" doc:id="0e9c651d-1218-4ab4-bed1-9ea2f30dcc3c" >
+		<flow-ref doc:name="GetAllKarta" doc:id="67a8f51e-3e63-4409-a25c-afa4a05bb4d8" name="getAllKarta" />
+	</flow>
+	<flow name="get:\korisnik:Autobuska_Stanica-config" doc:id="89623e38-6ea2-4fe8-907b-46aa61058f3f" >
+		<flow-ref doc:name="GetAllKorisnik" doc:id="3b066149-18a4-4c1b-b716-c245c618d4b8" name="getAllKorisnik" />
+	</flow>
+	<flow name="get:\ruta:Autobuska_Stanica-config" doc:id="f4d2c499-bc9d-4ef2-97f9-6bb65f2465af" >
+		<flow-ref doc:name="GetAllRuta" doc:id="ff91c3df-c49d-4906-aa9f-30e8710f5362" name="getAllRuta" />
+	</flow>
+	<flow name="get:\tipKarte:Autobuska_Stanica-config" doc:id="7ee7f334-3433-4a83-9fee-44ceed656303" >
+		<flow-ref doc:name="GetAllTipKarte" doc:id="7374f115-9f52-40cf-a625-fc5a83598ac0" name="getAllTipKarte" />
+	</flow>
+	<flow name="get:\zaposleni:Autobuska_Stanica-config" doc:id="d334bb6a-548a-41db-a39e-5596aa074cf2" >
+		<flow-ref doc:name="GetAllZaposleni" doc:id="6a7e9184-65ae-4c6f-ba30-07e206ae464d" name="getAllZaposleni" />
+	</flow>
+	<flow name="get:\autobus\(ID):Autobuska_Stanica-config" doc:id="60c6d17c-7644-4087-af02-5874c26ade10" >
+		<flow-ref doc:name="GetAutobusByID" doc:id="8b97048f-a190-4b47-997b-1aa448d7f1bc" name="getAutobusByID" />
+	</flow>
+	<flow name="get:\vozac\(ID):Autobuska_Stanica-config1" doc:id="ce12fd4e-14b8-4ba8-a774-a0b802092c41" >
+		<flow-ref doc:name="GetVozacByID" doc:id="4097cd0a-80e8-45ff-8b4e-2763f0716364" name="getVozacByID" />
+	</flow>
+	<flow name="get:\garaza\(ID):Autobuska_Stanica-config" doc:id="f745d3e7-0710-4f64-99b4-ba134af29cb6" >
+		<flow-ref doc:name="GetGarazaByID" doc:id="eeda55cf-f745-4068-983b-78e65fe5643a" name="getGarazaByID" />
+	</flow>
+	<flow name="get:\karta\(ID):Autobuska_Stanica-config" doc:id="b29a717e-b546-465c-80a3-3b8ed3ba316c" >
+		<flow-ref doc:name="GetKartaByID" doc:id="b2e88f92-3aec-4519-a153-da64f81b3f9b" name="getKartaByID" />
+	</flow>
+	<flow name="get:\korisnik\(ID):Autobuska_Stanica-config1" doc:id="28698a28-d3ed-4eba-a554-d2b325ada95b" >
+		<flow-ref doc:name="GetKorisnikByID" doc:id="6790c3e6-2ad9-478a-840b-970674d656b5" name="getKorisnikByID" />
+	</flow>
+	<flow name="get:\ruta\(ID):Autobuska_Stanica-config" doc:id="caa4f2b9-86e8-47c0-8b3b-3728367b87dd" >
+		<flow-ref doc:name="GetRutaByID" doc:id="753ce66b-978a-40a6-bd2d-34d114e05750" name="getRutaByID" />
+	</flow>
+	<flow name="get:\tipKarte\(ID):Autobuska_Stanica-config" doc:id="f6ac47af-1567-4f37-8056-0d0d46a67b8f" >
+		<flow-ref doc:name="GetTipKarteByID" doc:id="43f6fc08-774f-4fff-aa9c-dfb3823559e8" name="getTipKarteByID" />
+	</flow>
+	<flow name="get:\zaposleni\(ID):Autobuska_Stanica-config1" doc:id="3bf13e70-5f9f-43de-88ad-0a182a94b2fd" >
+		<flow-ref doc:name="GetZaposleniByID" doc:id="6405fdd5-81c9-41d1-bfc0-0a54d2cbf7d9" name="getZaposleniByID" />
+	</flow>
+	<flow name="post:\autobus:application\json:Autobuska_Stanica-config" doc:id="8aa9f71d-5e4f-48da-a38f-0c599f744500">
+		<flow-ref doc:name="insertAutobus" doc:id="f5cb1524-3032-4c69-ba0a-c168ae6bc9f3" name="insertAutobus" />
+	</flow>
+	<flow name="post:\garaza:application\json:Autobuska_Stanica-config" doc:id="0dd57980-0b48-4171-b6c2-622eb728a801">
+		<flow-ref doc:name="insertGaraza" doc:id="b9f8bde5-627d-4b4a-81e9-63a856cb366a" name="insertGaraza" />
+	</flow>
+	<flow name="post:\karta:application\json:Autobuska_Stanica-config" doc:id="1be534c1-e21e-47e0-bb74-41b93e49d0f3">
+		<flow-ref doc:name="insertKarta" doc:id="696672ae-bbbd-4ead-b5d7-12b3672c8ac8" name="insertKarta" />
+	</flow>
+	<flow name="post:\korisnik:application\json:Autobuska_Stanica-config" doc:id="e561edc0-ad69-441d-a30e-1eb3b466663d">
+		<flow-ref doc:name="insertKorisnik" doc:id="bf29fba6-8715-4631-88ce-f0589035e457" name="insertKorisnik" />
+	</flow>
+	<flow name="post:\tipKarte:application\json:Autobuska_Stanica-config" doc:id="b6c0669a-7eaf-4a28-8726-f0826bf14a80">
+		<flow-ref doc:name="insertTipKarte" doc:id="15d863dd-da46-41a0-a724-fd7b6e05c2fc" name="insertTipKarte" />
+	</flow>
+	<flow name="post:\ruta:application\json:Autobuska_Stanica-config" doc:id="018f2c13-28e7-406d-91d4-2fd1e7fb7a47">
+		<flow-ref doc:name="insertRuta" doc:id="b4d17c33-1036-4c78-86c3-c8b19839f45c" name="insertRuta" />
+	</flow>
+	<flow name="post:\vozac:application\json:Autobuska_Stanica-config" doc:id="44b1cd02-15cf-4053-ae4c-de8a193f62bf">
+		<flow-ref doc:name="insertVozac" doc:id="53f95424-31df-471e-9be4-06d7d1977f7c" name="insertVozac" />
+	</flow>
+	<flow name="post:\zaposleni:application\json:Autobuska_Stanica-config" doc:id="fbecee99-969e-44c7-bf58-b1361977b4f7">
+		<flow-ref doc:name="insertZaposleni" doc:id="74634f57-6c1c-401b-9987-0024e4fba800" name="insertZaposleni" />
+	</flow>
+	<flow name="delete:\autobus\(ID):Autobus_Stanica-config" doc:id="63da8f98-4a15-4b44-9bd1-e197ef9744cd" >
+		<flow-ref doc:name="deleteAutobus" doc:id="9b26d5c2-1334-423b-be77-ab0e1def583d" name="deleteAutobus" />
+	</flow>
+	<flow name="delete:\garaza\(ID):Autobus_Stanica-config" doc:id="6f84f9da-289b-4ac8-a3da-fec1dd7dbc5a" >
+		<flow-ref doc:name="deleteGaraza" doc:id="d08a222b-75b6-4915-bed7-9283f11e8e61" name="deleteGaraza" />
+	</flow>
+	<flow name="delete:\karta\(ID):Autobus_Stanica-config1" doc:id="539442b4-41e0-433e-8cc8-47f66c74289d" >
+		<flow-ref doc:name="deleteKarta" doc:id="c01e631f-9134-45d8-a79a-8b04fdd31a3b" name="deleteKarta" />
+	</flow>
+	<flow name="delete:\korisnik\(ID):Autobus_Stanica-config" doc:id="071b2fa2-7446-4ab8-9fec-0156a0f8376a" >
+		<flow-ref doc:name="deleteKorisnik" doc:id="9bd9c4a3-284c-4626-8129-443114aaf090" name="deleteKorisnik" />
+	</flow>
+	<flow name="delete:\ruta\(ID):Autobus_Stanica-config1" doc:id="3375c6a5-ba8d-49e9-b1ea-cacd500813f9" >
+		<flow-ref doc:name="deleteRuta" doc:id="445cab0e-a225-4ce9-8ce5-d485e5f3fc01" name="deleteRuta" />
+	</flow>
+	<flow name="delete:\tipKarte\(ID):Autobus_Stanica-config" doc:id="8e9265d8-c9c5-43c4-8397-4a9a85a191f6" >
+		<flow-ref doc:name="deleteTipKarte" doc:id="0c3495a4-cf1b-4d3f-9e37-8fa532e64f68" name="deleteTipKarte" />
+	</flow>
+	<flow name="delete:\vozac\(ID):Autobus_Stanica-config1" doc:id="f4e5c305-8a3c-4c0c-8d72-76373c0531b0" >
+		<flow-ref doc:name="deleteVozac" doc:id="efac5a5d-3a53-4e21-8ae5-c91d1168e5e9" name="deleteVozac" />
+	</flow>
+	<flow name="delete:\zaposleni\(ID):Autobus_Stanica-config" doc:id="07f41cd6-73f2-4b77-9542-8656c1b74272" >
+		<flow-ref doc:name="deleteZaposleni" doc:id="96d88115-2659-492d-965d-fd8f41879ee3" name="deleteZaposleni" />
+	</flow>
+	<flow name="put:\autobus\(ID):application\json:Autobuska_Stanica-config" doc:id="070c3a00-9d14-4755-ab52-d2797534fb0b" >
+		<flow-ref doc:name="updateAutobus" doc:id="3331831e-c5cc-4dc6-8a76-2d92b15010ee" name="updateAutobus" />
+	</flow>
+	<flow name="put:\garaza\(ID):application\json:Autobuska_Stanica-config" doc:id="7c429659-f050-439e-835b-eaef93af31f5" >
+		<flow-ref doc:name="updateGaraza" doc:id="504ca47d-c75c-4078-bde9-33b53b18a9ad" name="updateGaraza" />
+	</flow>
+	<flow name="put:\karta\(ID):application\json:Autobuska_Stanica-config" doc:id="8aa42a76-3cbe-4cf9-89e9-565a446b56b4" >
+		<flow-ref doc:name="updateKarta" doc:id="1f0b49d9-6d5a-4b35-8182-6ca130820637" name="updateKarta" />
+	</flow>
+	<flow name="put:\korisnik\(ID):application\json:Autobuska_Stanica-config" doc:id="d98aeeeb-d68c-4d0c-9827-86e83e4634c1" >
+		<flow-ref doc:name="updateKorisnik" doc:id="6116a4a8-6c07-4ca9-b654-dd62ffdf2b5e" name="updateKorisnik" />
+	</flow>
+	<flow name="put:\ruta\(ID):application\json:Autobuska_Stanica-config" doc:id="2431c0dd-5d88-469e-bb83-2b16f8e2f6eb" >
+		<flow-ref doc:name="updateRuta" doc:id="25458a2e-7d58-4a24-8dbf-6b309276b351" name="updateRuta" />
+	</flow>
+	<flow name="put:\tipKarte\(ID):application\json:Autobuska_Stanica-config" doc:id="add75dc1-a352-40bd-a583-4faa30b02e8f" >
+		<flow-ref doc:name="updateTipKarte" doc:id="be2dbd7f-070d-482b-b46a-252dbd8f6371" name="updateTipKarte" />
+	</flow>
+	<flow name="put:\vozac\(ID):application\json:Autobuska_Stanica-config" doc:id="944c1941-e27f-4f05-bb2f-e9edac55eebc" >
+		<flow-ref doc:name="updateVozac" doc:id="ad01c558-b74b-4d74-b752-1773380ae9d1" name="updateVozac" />
+	</flow>
+	<flow name="put:\zaposleni\(ID):application\json:Autobuska_Stanica-config" doc:id="632d8689-93d1-4d22-9b5d-92b20cc09734" >
+		<flow-ref doc:name="updateZaposleni" doc:id="5efdaaba-5dc1-4af8-8723-889ef4dced0c" name="updateZaposleni" />
+	</flow>
+</mule>

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_7872f275_62fc_4a6e_81f7_c524ee6b1366_Output_Payload = Array<{|  TipKarteID: Number,   NazivKarte: String|}>
+

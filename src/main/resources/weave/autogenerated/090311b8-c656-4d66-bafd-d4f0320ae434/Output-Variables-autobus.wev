@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_090311b8_c656_4d66_bafd_d4f0320ae434_Output_Variables_autobus = Any
+

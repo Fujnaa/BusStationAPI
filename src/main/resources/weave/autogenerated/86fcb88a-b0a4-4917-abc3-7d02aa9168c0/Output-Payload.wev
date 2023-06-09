@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_86fcb88a_b0a4_4917_abc3_7d02aa9168c0_Output_Payload = Array<{|  VozacID: Number,   JMBG: String,   Ime: String,   Prezime: String,   Adresa?: String,   Grad?: String,   Kontakt: String|}>
+
