@@ -1,4 +1,4 @@
-# AutobuskaStanicaAPI
+# BusStationAPI
 An API Project made in Anypoint Studio.
 The project is supposed to simulate an API of a Bus Station Informatics System.
 The database of which the data is being extracted has been made in MySQL. Therefore in order to access the data, you would have to have your own local database.
